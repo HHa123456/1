@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身动作视频工具 - 全新升级</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        danger: '#EF4444',
+                        'primary-dark': '#2563EB',
+                        'secondary-dark': '#059669'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary-dark text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2;
+            }
+            .btn-primary:hover {
+                @apply shadow-md transform -translate-y-0.5;
+            }
+            .spinner {
+                @apply border-4 border-gray-200 border-t-primary rounded-full w-10 h-10 animate-spin mx-auto my-4;
+            }
+            .difficulty-badge {
+                @apply px-2 py-1 rounded-full text-xs font-semibold;
+            }
+            .beginner {
+                @apply bg-green-100 text-green-800;
+            }
+            .intermediate {
+                @apply bg-yellow-100 text-yellow-800;
+            }
+            .advanced {
+                @apply bg-red-100 text-red-800;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- 顶部导航 -->
+        <header class="bg-dark text-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <i class="fa fa-dumbbell text-3xl"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold">健身动作视频工具</h1>
+                </div>
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="#" class="hover:text-primary transition-colors">首页</a>
+                    <a href="#" class="hover:text-primary transition-colors">训练计划</a>
+                    <a href="#" class="hover:text-primary transition-colors">营养指南</a>
+                    <a href="#" class="hover:text-primary transition-colors">社区</a>
+                </div>
+                <button class="md:hidden text-xl">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 侧边栏工具 -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-dark flex items-center gap-3 mb-4">
+                        <i class="fa fa-sliders text-primary"></i>
+                        训练筛选
+                    </h2>
+
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">选择训练部位</label>
+                            <select id="bodyPart" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                                <option value="">-- 请选择身体部位 --</option>
+                                <option value="chest">胸部</option>
+                                <option value="back">背部</option>
+                                <option value="legs">腿部</option>
+                                <option value="shoulders">肩部</option>
+                                <option value="arms">手臂</option>
+                                <option value="abs">腹部</option>
+                                <option value="fullbody">全身</option>
+                                <option value="stretch">拉伸放松</option>
+                                <option value="posture">体态矫正</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">难度级别</label>
+                            <select id="difficulty" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                                <option value="all">全部难度</option>
+                                <option value="beginner">初级</option>
+                                <option value="intermediate">中级</option>
+                                <option value="advanced">高级</option>
+                            </select>
+                        </div>
+
+                        <button id="getVideosBtn" class="btn-primary">
+                            <i class="fa fa-play-circle"></i>
+                            获取视频推荐
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 健身小知识 -->
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-dark flex items-center gap-3 mb-4">
+                        <i class="fa fa-lightbulb-o text-primary"></i>
+                        健身小贴士
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="bg-primary/10 rounded-full p-2">
+                                <i class="fa fa-check text-primary"></i>
+                            </div>
+                            <p class="text-sm text-gray-700">训练前动态拉伸，训练后静态拉伸，帮助预防受伤</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="bg-primary/10 rounded-full p-2">
+                                <i class="fa fa-check text-primary"></i>
+                            </div>
+                            <p class="text-sm text-gray-700">每周安排2-3次同部位训练，给肌肉足够恢复时间</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="bg-primary/10 rounded-full p-2">
+                                <i class="fa fa-check text-primary"></i>
+                            </div>
+                            <p class="text-sm text-gray-700">保持正确呼吸：发力时呼气，还原时吸气</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="bg-primary/10 rounded-full p-2">
+                                <i class="fa fa-check text-primary"></i>
+                            </div>
+                            <p class="text-sm text-gray-700">新手建议从自重训练开始，逐步增加负重</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 身体部位图表 -->
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-dark flex items-center gap-3 mb-4">
+                        <i class="fa fa-user text-primary"></i>
+                        身体部位
+                    </h2>
+
+                    <div class="relative h-64 w-full flex items-center justify-center">
+                        <svg width="200" height="300" viewBox="0 0 200 300">
+                            <!-- 头部 -->
+                            <circle cx="100" cy="50" r="30" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2"/>
+
+                            <!-- 身体 -->
+                            <path d="M70,80 Q100,150 130,80" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2"/>
+                            <rect x="80" y="80" width="40" height="100" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2"/>
+
+                            <!-- 手臂 -->
+                            <path d="M80,100 Q40,120 80,140" fill="none" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M120,100 Q160,120 120,140" fill="none" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+
+                            <!-- 腿部 -->
+                            <path d="M80,180 Q60,250 80,280" fill="none" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M120,180 Q140,250 120,280" fill="none" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+
+                            <!-- 部位标签 -->
+                            <text x="100" y="40" text-anchor="middle" fill="#64748B" font-size="12">肩部</text>
+                            <text x="100" y="120" text-anchor="middle" fill="#64748B" font-size="12">胸部</text>
+                            <text x="100" y="150" text-anchor="middle" fill="#64748B" font-size="12">腹部</text>
+                            <text x="100" y="190" text-anchor="middle" fill="#64748B" font-size="12">手臂</text>
+                            <text x="100" y="250" text-anchor="middle" fill="#64748B" font-size="12">腿部</text>
+                            <text x="100" y="80" text-anchor="middle" fill="#64748B" font-size="12">背部</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 视频内容区 -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-dark flex items-center gap-3 mb-4">
+                        <i class="fa fa-play-circle text-primary"></i>
+                        推荐视频
+                    </h2>
+
+                    <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="col-span-full flex flex-col items-center justify-center py-12">
+                            <div class="text-6xl text-gray-300 mb-4">
+                                <i class="fa fa-film"></i>
+                            </div>
+                            <p class="text-gray-500 mb-2">请选择训练部位并点击"获取视频推荐"按钮</p>
+                            <p class="text-gray-400 text-sm">我们将为您展示专业的健身动作教学视频</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 视频预览模态框 -->
+                <div id="videoModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden relative">
+                        <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl z-10">
+                            <i class="fa fa-times"></i>
+                        </button>
+
+                        <div class="p-6">
+                            <h3 id="modalTitle" class="text-2xl font-bold text-dark mb-4"></h3>
+
+                            <div class="aspect-video bg-gray-100 rounded-xl overflow-hidden mb-6">
+                                <iframe id="videoFrame" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+                            </div>
+
+                            <div class="flex items-center justify-between mb-4">
+                                <span id="modalDifficulty" class="difficulty-badge"></span>
+                                <a id="modalLink" href="#" target="_blank" class="text-primary hover:text-primary-dark font-medium flex items-center gap-1">
+                                    在B站观看 <i class="fa fa-external-link"></i>
+                                </a>
+                            </div>
+
+                            <div class="text-gray-600">
+                                <h4 class="font-bold mb-2">动作要点：</h4>
+                                <p id="modalDescription" class="text-sm"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>健身动作视频工具 © 2023 | 专业健身指导</p>
+        </footer>
+    </div>
+
+    <script>
+        // 健身视频数据库（整合最新B站链接）
+        const fitnessVideos = {
+            chest: [
+                {
+                    name: "平板卧推｜胸肌基础训练",
+                    url: "https://www.bilibili.com/video/BV1zZLWzREym?vd_source=61a0887cd82b7ba155d57eecb4fb7479&spm_id_from=333.788.videopod.episodes&p=33",
+                    difficulty: "beginner",
+                    description: "平板卧推是锻炼胸大肌的基础动作，主要刺激胸大肌中部和外侧。注意保持肩胛骨下沉，核心收紧，避免腰部借力。每组8-12次，做3-4组。"
+                },
+                {
+                    name: "上斜哑铃推举｜胸肌上部训练",
+                    url: "https://www.bilibili.com/video/BV1zZLWzREym?vd_source=61a0887cd82b7ba155d57eecb4fb7479&spm_id_from=333.788.videopod.episodes&p=33",
+                    difficulty: "intermediate",
+                    description: "上斜哑铃推举主要锻炼胸大肌上部。调整座椅角度为45度，手持哑铃时掌心朝前，推起时手臂不要完全伸直，保持一定张力。每组8-10次，做3组。"
+                },
+                {
+                    name: "双杠臂屈伸｜胸肌下部训练",
+                    url: "https://www.bilibili.com/video/BV1zZLWzREym?vd_source=61a0887cd82b7ba155d57eecb4fb7479&spm_id_from=333.788.videopod.episodes&p=33",
+                    difficulty: "advanced",
+                    description: "双杠臂屈伸是复合动作，主要锻炼胸肌下部和三头肌。身体前倾，重心放在胸部，下降时肘部向外打开。初学者可使用辅助器械，每组8-12次，做3组。"
+                },
+                {
+                    name: "哑铃飞鸟｜胸肌中缝训练",
+                    url: "https://www.bilibili.com/video/BV1zZLWzREym?vd_source=61a0887cd82b7ba155d57eecb4fb7479&spm_id_from=333.788.videopod.episodes&p=33",
+                    difficulty: "intermediate",
+                    description: "哑铃飞鸟是孤立动作，主要刺激胸肌外侧和中缝。仰卧在平板上，手持哑铃时手肘微屈，向两侧打开时感受胸肌拉伸，返回时挤压胸肌。每组10-15次，做3组。"
+                },
+                {
+                    name: "器械夹胸｜胸肌孤立训练",
+                    url: "https://www.bilibili.com/video/BV1zZLWzREym?vd_source=61a0887cd82b7ba155d57eecb4fb7479&spm_id_from=333.788.videopod.episodes&p=33",
+                    difficulty: "beginner",
+                    description: "器械夹胸是固定轨迹动作，适合初学者。调整座椅高度，使把手与肩同高，夹紧时收缩胸肌，保持1秒。每组12-15次，做3组。"
+                }
+            ],
+            back: [
+                {
+                    name: "引体向上｜背部黄金动作",
+                    url: "https://www.bilibili.com/video/BV1tf421Q7th/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "引体向上是锻炼背部的黄金动作，主要刺激背阔肌和肱二头肌。掌心朝前，握距略宽于肩，向上拉时肩胛骨下沉，胸部贴近杠。初学者可使用弹力带辅助，每组8-12次，做3组。"
+                },
+                {
+                    name: "杠铃划船｜上背部训练",
+                    url: "https://www.bilibili.com/video/BV1YG411S7o9/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "杠铃划船是复合动作，主要锻炼上背部和斜方肌中下束。双脚与肩同宽，膝盖微屈，上半身前倾约45度，保持背部挺直，将杠铃拉向腹部。每组8-10次，做3组。"
+                },
+                {
+                    name: "坐姿划船｜背部孤立训练",
+                    url: "https://www.bilibili.com/video/BV1UG411k7ZM/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "坐姿划船是固定轨迹动作，适合初学者。调整重量，保持背部挺直，将把手拉向腹部，注意手肘贴近身体。每组10-15次，做3组。"
+                },
+                {
+                    name: "高位下拉｜背阔肌训练",
+                    url: "https://www.bilibili.com/video/BV1dC4y1r7nQ?spm_id_from=333.788.videopod.sections&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "高位下拉主要锻炼背阔肌和上背部。调整重量，掌心朝前，握距略宽于肩，将杆拉向锁骨，保持肩胛骨下沉。每组10-15次，做3组。"
+                },
+                {
+                    name: "直腿硬拉｜下背部训练",
+                    url: "https://www.bilibili.com/video/BV1Mr421L75m?spm_id_from=333.788.videopod.sections&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "advanced",
+                    description: "直腿硬拉主要锻炼下背部和腘绳肌。双脚与肩同宽，膝盖微屈，上半身前倾，保持背部挺直，将杠铃拉向大腿。每组8-10次，做3组。"
+                }
+            ],
+            legs: [
+                {
+                    name: "深蹲｜下肢基础训练",
+                    url: "https://www.bilibili.com/video/BV1FB4y137gi/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "深蹲是锻炼下肢的基础动作，主要刺激股四头肌、臀大肌和腘绳肌。双脚与肩同宽，脚尖略微外展，下蹲时膝盖不要内扣，臀部向后坐，保持背部挺直。每组8-12次，做3-4组。"
+                },
+                {
+                    name: "硬拉｜全身力量训练",
+                    url: "https://www.bilibili.com/video/BV1dw411D7Py/?spm_id_from=333.337.search-card.all.click",
+                    difficulty: "advanced",
+                    description: "硬拉是复合动作，主要锻炼下背部、臀部和大腿后侧。双脚与肩同宽，杠铃贴近小腿，下蹲时保持背部挺直，臀部后移，将杠铃拉至大腿前侧。每组6-8次，做3组。"
+                },
+                {
+                    name: "腿举｜股四头肌训练",
+                    url: "https://www.bilibili.com/video/BV1BL4y1L7wt/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "腿举是固定轨迹动作，适合初学者和需要减轻下背部压力的人群。调整座椅位置，双脚与肩同宽，膝盖不要内扣，将平台推起时呼气，放下时吸气。每组10-15次，做3组。"
+                },
+                {
+                    name: "箭步蹲｜单腿训练",
+                    url: "https://www.bilibili.com/video/BV1Et42187nB/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "箭步蹲是单腿训练动作，主要锻炼股四头肌和臀大肌。手持哑铃或杠铃，向前跨出一步，下蹲时前膝不要超过脚尖，后膝不要接触地面。每侧腿8-12次，做3组。"
+                },
+                {
+                    name: "腿弯举｜腘绳肌训练",
+                    url: "https://www.bilibili.com/video/BV1Hx4y1Y7TN?spm_id_from=333.788.videopod.sections&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "腿弯举是孤立动作，主要锻炼腘绳肌。躺在腿弯举机上，脚跟贴近滚轮，收缩腘绳肌将小腿抬起，保持1秒。每组10-15次，做3组。"
+                }
+            ],
+            shoulders: [
+                {
+                    name: "哑铃推举｜肩部基础训练",
+                    url: "https://www.bilibili.com/video/BV1uw411N7MC?spm_id_from=333.788.videopod.sections&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "哑铃推举是锻炼肩部的基础动作，主要刺激三角肌前束和中束。坐在椅子上，手持哑铃，掌心朝前，推起时手肘略微向外，不要完全伸直手臂。每组8-12次，做3组。"
+                },
+                {
+                    name: "侧平举｜三角肌中束训练",
+                    url: "https://www.bilibili.com/video/BV1qA4y1S7Er/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "侧平举主要锻炼三角肌中束。手持哑铃，掌心朝下，向两侧抬起时手肘略微弯曲，不要耸肩，最高点时与肩同高。每组10-15次，做3组。"
+                },
+                {
+                    name: "面拉｜三角肌后束训练",
+                    url: "https://www.bilibili.com/video/BV1wZ421e7K2/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "面拉主要锻炼三角肌后束和上背部。使用绳索机，调整低位滑轮，掌心朝上，将绳索拉向面部，注意手肘向外打开。每组12-15次，做3组。"
+                },
+                {
+                    name: "杠铃推举｜肩部复合训练",
+                    url: "https://www.bilibili.com/video/BV1gT411Q7Cb/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "杠铃推举是复合动作，主要锻炼三角肌前束和中束。坐在椅子上，双手握住杠铃，握距略宽于肩，推起时手肘略微向外，不要完全伸直手臂。每组8-10次，做3组。"
+                },
+                {
+                    name: "反向飞鸟｜三角肌后束训练",
+                    url: "https://www.bilibili.com/video/BV1F1zAYEEfV/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "反向飞鸟主要锻炼三角肌后束。俯身约90度，手持哑铃，掌心朝内，向两侧抬起时手肘略微弯曲，最高点时与肩同高。每组12-15次，做3组。"
+                }
+            ],
+            arms: [
+                {
+                    name: "杠铃弯举｜肱二头肌训练",
+                    url: "https://www.bilibili.com/video/BV1nb4y1M7By/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "杠铃弯举是锻炼肱二头肌的基础动作。双手握住杠铃，握距与肩同宽，掌心朝上，收缩肱二头肌将杠铃弯起，保持肘部稳定。每组8-12次，做3组。"
+                },
+                {
+                    name: "窄距卧推｜肱三头肌训练",
+                    url: "https://www.bilibili.com/video/BV14m421E71T/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "窄距卧推主要锻炼肱三头肌。躺在平板上，双手握住杠铃，握距约为肩宽的一半，推起时手肘贴近身体。每组8-10次，做3组。"
+                },
+                {
+                    name: "绳索下压｜肱三头肌训练",
+                    url: "https://www.bilibili.com/video/BV1fjMyzZEt5/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "绳索下压是锻炼肱三头肌的孤立动作。使用绳索机，调整高位滑轮，掌心朝下，将绳索压下时保持肘部稳定，不要晃动身体。每组10-15次，做3组。"
+                },
+                {
+                    name: "锤式弯举｜肱肌训练",
+                    url: "https://www.bilibili.com/video/BV1ca4y1w73F/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "锤式弯举主要锻炼肱肌和肱二头肌外侧。手持哑铃，掌心相对，收缩肱肌将哑铃弯起，保持肘部稳定。每组10-15次，做3组。"
+                },
+                {
+                    name: "仰卧臂屈伸｜肱三头肌训练",
+                    url: "https://www.bilibili.com/video/BV1pD421H7zw/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "仰卧臂屈伸主要锻炼肱三头肌长头。躺在平板上，手持哑铃，向上伸直手臂，然后弯曲肘部，将哑铃放至头顶后方，再伸直手臂。每组10-12次，做3组。"
+                }
+            ],
+            abs: [
+                {
+                    name: "卷腹｜腹肌基础训练",
+                    url: "https://www.bilibili.com/video/BV115411d7MG/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "卷腹是锻炼腹肌的基础动作。躺在垫子上，屈膝，双手抱头，收缩腹肌将上半身抬起，注意不要用手臂拉扯头部。每组15-20次，做3组。"
+                },
+                {
+                    name: "悬挂抬腿｜下腹肌训练",
+                    url: "https://www.bilibili.com/video/BV1Uo4y1t7S6/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "悬挂抬腿主要锻炼下腹肌。双手握住单杠，身体悬空，收缩腹肌将双腿抬起，膝盖可以微屈。每组8-12次，做3组。"
+                },
+                {
+                    name: "俄罗斯转体｜腹斜肌训练",
+                    url: "https://www.bilibili.com/video/BV1AF411i7yq/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "俄罗斯转体主要锻炼腹斜肌。坐在垫子上，屈膝，身体向后倾斜约45度，双手握住哑铃或其他重物，向两侧转动身体。每组15-20次，做3组。"
+                },
+                {
+                    name: "平板支撑｜核心训练",
+                    url: "https://www.bilibili.com/video/BV1V24y1E7qW/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "平板支撑是锻炼核心肌群的动作。双肘和双脚支撑地面，保持身体呈一条直线，不要塌腰或撅臀。每次保持30-60秒，做3-4组。"
+                },
+                {
+                    name: "龙旗｜高阶腹肌训练",
+                    url: "https://www.bilibili.com/video/BV1VN41177gz/?spm_id_from=333.337.search-card.all.click",
+                    difficulty: "advanced",
+                    description: "龙旗是高阶腹肌训练动作。双手握住单杠，身体悬空，收缩腹肌将双腿和上半身同时抬起，保持身体呈一条直线。每组5-8次，做3组。"
+                }
+            ],
+            fullbody: [
+                {
+                    name: "帕梅拉7天居家训练｜全身燃脂",
+                    url: "https://www.bilibili.com/video/BV18V411m75y/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "帕梅拉7天居家训练计划，包含全身燃脂、核心训练和拉伸放松，适合中级健身者。每天20-30分钟，高效燃脂的同时提升身体协调性。"
+                },
+                {
+                    name: "HIIT合集｜高效燃脂",
+                    url: "https://www.bilibili.com/video/BV1z5411M7Sw/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "advanced",
+                    description: "高强度间歇训练合集，通过短时间高强度运动搭配低强度恢复，高效燃烧脂肪。每次训练20分钟，相当于传统有氧40分钟的效果。"
+                },
+                {
+                    name: "全程站立训练｜膝盖友好",
+                    url: "https://www.bilibili.com/video/BV1jD4y147dZ/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "全程站立的全身训练，避免膝盖压力，适合初学者和关节敏感人群。动作简单易学，包含深蹲、弓步、推举等基础动作的组合。"
+                },
+                {
+                    name: "舞蹈燃脂｜快乐健身",
+                    url: "https://www.bilibili.com/video/BV1V7woe1E1j/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "将健身动作融入舞蹈中，在快乐中燃烧脂肪。包含多种舞蹈风格，提升协调性和节奏感，适合喜欢趣味训练的人群。"
+                },
+                {
+                    name: "壶铃摇摆｜全身爆发力",
+                    url: "https://www.bilibili.com/video/BV1ZT421k7H3/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "advanced",
+                    description: "壶铃摇摆是锻炼全身爆发力的动作。双脚与肩同宽，手持壶铃，下蹲时将壶铃放在双腿之间，然后利用臀部发力将壶铃向前上方摆动至胸部高度。每组15-20次，做3组。"
+                }
+            ],
+            stretch: [
+                {
+                    name: "运动后全身拉伸｜缓解肌肉酸痛",
+                    url: "https://www.bilibili.com/video/BV1vW4y117sM/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "运动后静态拉伸合集，针对全身主要肌肉群，帮助缓解肌肉酸痛和僵硬，促进血液循环和肌肉恢复。每次训练后进行10-15分钟。"
+                },
+                {
+                    name: "5分钟快速拉伸｜碎片时间放松",
+                    url: "https://www.bilibili.com/video/BV1jM4y177oN/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "适合碎片时间的快速拉伸，缓解久坐导致的肌肉紧张。针对肩颈、腰背、腿部等部位，每个动作保持15-30秒，快速放松身体。"
+                },
+                {
+                    name: "10分钟快速拉伸｜改善腿型",
+                    url: "https://www.bilibili.com/video/BV1zN4y157NJ/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "专门针对腿部的拉伸训练，帮助放松小腿和大腿肌肉，改善肌肉线条，缓解运动后的腿部酸胀。适合腿部训练后或睡前进行。"
+                },
+                {
+                    name: "瑜伽拉伸｜提升柔韧性",
+                    url: "https://www.bilibili.com/video/BV15V411a7cV/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "结合瑜伽动作的全身拉伸训练，提升身体柔韧性和平衡能力。包含下犬式、猫牛式、三角式等经典瑜伽动作，适合有一定基础的练习者。"
+                },
+                {
+                    name: "泡沫轴放松｜深层肌肉按摩",
+                    url: "https://www.bilibili.com/video/BV1pp4y1X7og/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "使用泡沫轴进行深层肌肉放松，帮助缓解肌肉紧张和结节。针对大腿、小腿、背部等部位，每个部位滚动1-2分钟，配合拉伸效果更佳。"
+                }
+            ],
+            posture: [
+                {
+                    name: "体态矫正合集｜改善圆肩驼背",
+                    url: "https://www.bilibili.com/video/BV1UB4y117sH/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "针对圆肩、驼背、头前倾等常见不良体态的矫正训练。包含肩背拉伸、核心激活和姿势训练，每天10-15分钟，逐步改善体态。"
+                },
+                {
+                    name: "骨盆操｜改善假胯宽",
+                    url: "https://www.bilibili.com/video/BV1Xt4y1Y7iD/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "通过针对性训练调整骨盆位置，改善假胯宽、骨盆前倾等问题。动作简单易学，适合久坐人群，每天10分钟，提升身体线条。"
+                },
+                {
+                    name: "肩颈放松｜缓解颈椎不适",
+                    url: "https://www.bilibili.com/video/BV1vu411e7fC/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "针对肩颈紧张和颈椎不适的放松训练。包含颈部拉伸、肩部旋转等动作，缓解长时间低头导致的肩颈疼痛，适合办公族和学生党。"
+                },
+                {
+                    name: "膝超伸矫正｜改善腿部线条",
+                    url: "https://www.bilibili.com/video/BV1jf4y1D7QM/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "intermediate",
+                    description: "针对膝超伸问题的矫正训练，通过激活腿部肌肉和拉伸韧带，调整膝关节位置，改善腿部线条。需要一定的肌肉控制能力，适合有基础的练习者。"
+                },
+                {
+                    name: "扁平足矫正｜增强足弓支撑",
+                    url: "https://www.bilibili.com/video/BV1mm4y1c7pP/?spm_id_from=333.337.search-card.all.click&vd_source=61a0887cd82b7ba155d57eecb4fb7479",
+                    difficulty: "beginner",
+                    description: "通过足部肌肉训练和筋膜放松，增强足弓支撑，改善扁平足问题。包含脚趾抓地、弹力带训练等动作，适合足部力量较弱的人群。"
+                }
+            ]
+        };
+
+        // DOM 元素
+        const bodyPartSelect = document.getElementById('bodyPart');
+        const difficultySelect = document.getElementById('difficulty');
+        const getVideosBtn = document.getElementById('getVideosBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const videoModal = document.getElementById('videoModal');
+        const closeModal = document.getElementById('closeModal');
+        const videoFrame = document.getElementById('videoFrame');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDifficulty = document.getElementById('modalDifficulty');
+        const modalLink = document.getElementById('modalLink');
+        const modalDescription = document.getElementById('modalDescription');
+
+        // 事件监听
+        getVideosBtn.addEventListener('click', getVideos);
+        closeModal.addEventListener('click', closeVideoModal);
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+
+        // 获取视频函数
+        function getVideos() {
+            const bodyPart = bodyPartSelect.value;
+            const difficulty = difficultySelect.value;
+
+            if (!bodyPart) {
+                alert("请选择训练部位");
+                return;
+            }
+
+            // 显示加载状态
+            resultsContainer.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-8">
+                    <div class="spinner"></div>
+                    <p class="text-gray-500">正在加载推荐视频...</p>
+                </div>
+            `;
+
+            // 模拟API请求延迟
+            setTimeout(() => {
+                // 获取对应部位的视频
+                let videos = fitnessVideos[bodyPart] || [];
+
+                // 过滤难度级别
+                if (difficulty !== "all") {
+                    videos = videos.filter(video => video.difficulty === difficulty);
+                }
+
+                if (videos.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="col-span-full flex flex-col items-center justify-center py-12">
+                            <div class="text-6xl text-gray-300 mb-4">
+                                <i class="fa fa-frown-o"></i>
+                            </div>
+                            <p class="text-gray-500 mb-2">未找到匹配的视频</p>
+                            <p class="text-gray-400 text-sm">请尝试选择其他身体部位或难度级别</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 渲染视频卡片
+                resultsContainer.innerHTML = '';
+
+                videos.forEach(video => {
+                    const videoCard = document.createElement('div');
+                    videoCard.className = 'bg-white rounded-xl shadow-sm overflow-hidden card-hover';
+
+                    // 提取视频ID
+                    const videoId = video.url.split('/').pop().replace('BV', '');
+
+                    // 难度中文显示和样式
+                    let difficultyText = '';
+                    let difficultyClass = '';
+                    switch(video.difficulty) {
+                        case 'beginner':
+                            difficultyText = '初级';
+                            difficultyClass = 'beginner';
+                            break;
+                        case 'intermediate':
+                            difficultyText = '中级';
+                            difficultyClass = 'intermediate';
+                            break;
+                        case 'advanced':
+                            difficultyText = '高级';
+                            difficultyClass = 'advanced';
+                            break;
+                    }
+
+                    // 生成随机封面图（实际项目中可替换为B站API获取的真实封面）
+                    const coverId = Math.floor(Math.random() * 100);
+                    const coverUrl = `https://picsum.photos/600/400?random=${coverId}`;
+
+                    videoCard.innerHTML = `
+                        <div class="relative aspect-video bg-gray-100">
+                            <img src="${coverUrl}" alt="${video.name}封面图" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                                <div class="p-4">
+                                    <h3 class="text-white font-bold text-lg">${video.name}</h3>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="difficulty-badge ${difficultyClass}">${difficultyText}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="play-button absolute inset-0 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity">
+                                <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-gray-600 text-sm line-clamp-2">${video.description.substring(0, 80)}...</p>
+                            <div class="mt-4 flex justify-between items-center">
+                                <span class="text-xs text-gray-500">${video.difficulty.charAt(0).toUpperCase() + video.difficulty.slice(1)}</span>
+                                <button class="watch-button text-primary hover:text-primary-dark font-medium flex items-center gap-1 text-sm">
+                                    查看详情 <i class="fa fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    // 添加点击事件
+                    const playButton = videoCard.querySelector('.play-button');
+                    const watchButton = videoCard.querySelector('.watch-button');
+
+                    playButton.addEventListener('click', () => {
+                        openVideoModal(video);
+                    });
+
+                    watchButton.addEventListener('click', () => {
+                        openVideoModal(video);
+                    });
+
+                    resultsContainer.appendChild(videoCard);
+                });
+            }, 800); // 模拟网络延迟
+        }
+
+        // 打开视频模态框
+        function openVideoModal(video) {
+            // 提取视频ID
+            const videoId = video.url.split('/').pop().replace('BV', '');
+
+            // 设置模态框内容
+            modalTitle.textContent = video.name;
+            videoFrame.src = `https://player.bilibili.com/player.html?bvid=${videoId}&high_quality=1`;
+            modalLink.href = video.url;
+
+            // 设置难度标签
+            let difficultyText = '';
+            let difficultyClass = '';
+            switch(video.difficulty) {
+                case 'beginner':
+                    difficultyText = '初级';
+                    difficultyClass = 'beginner';
+                    break;
+                case 'intermediate':
+                    difficultyText = '中级';
+                    difficultyClass = 'intermediate';
+                    break;
+                case 'advanced':
+                    difficultyText = '高级';
+                    difficultyClass = 'advanced';
+                    break;
+            }
+
+            modalDifficulty.textContent = difficultyText;
+            modalDifficulty.className = `difficulty-badge ${difficultyClass}`;
+
+            // 设置描述
+            modalDescription.textContent = video.description;
+
+            // 显示模态框
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 禁止背景滚动
+        }
+
+        // 关闭视频模态框
+        function closeVideoModal() {
+            videoModal.classList.add('hidden');
+            document.body.style.overflow = ''; // 恢复背景滚动
+            videoFrame.src = ''; // 停止视频播放
+        }
+
+        // ESC键关闭模态框
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !videoModal.classList.contains('hidden')) {
+                closeVideoModal();
+            }
+        });
+    </script>
+</body>
+</html>
